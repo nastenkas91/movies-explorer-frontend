@@ -1,0 +1,22 @@
+.register {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  min-height: 100vh;
+}
+
+@media screen and (max-width: 768px) {
+  .register {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .register {
+    padding: 56px 30px 0 30px;
+    align-content: unset;
+    justify-content: unset;
+  }
+}
