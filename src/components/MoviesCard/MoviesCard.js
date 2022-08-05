@@ -23,11 +23,11 @@ function MoviesCard({ nameRU, duration, image }) {
         <h4 className="card__title">{nameRU}</h4>
         {
           location.pathname === '/movies' &&
-          <button className={`card__btn card__btn_like-off ${isLiked && 'card__btn_like-on'}`} onClick={onLikeBtnClick}></button>
+          <button type="button" className={`card__btn card__btn_like-off ${isLiked && 'card__btn_like-on'}`} onClick={onLikeBtnClick}></button>
         }
         {
           location.pathname === '/saved-movies' &&
-          <button className="card__btn card__btn_delete"></button>
+          <button type="button" className="card__btn card__btn_delete"></button>
         }
       </div>
       <p className="card__duration">{convertMinToHrs(duration)}</p>

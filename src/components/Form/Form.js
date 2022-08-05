@@ -56,7 +56,7 @@ function Form({ title, isRegForm, button, spanText, spanBtn, spanBtnLink }) {
       />
       <span className='form__error'>{errors.password}</span>
       <div className="form__btn-wraper">
-        <button className={`form__button ${!formIsValid ? 'form__button_type_disabled' : ''}`}>{button}</button>
+        <button type="submit" className={`form__button ${!formIsValid ? 'form__button_type_disabled' : ''}`}>{button}</button>
         <p className="form__span-login">{spanText}
           <NavLink to={spanBtnLink} className='form__span-btn'>{spanBtn}</NavLink>
         </p>

@@ -99,6 +99,10 @@
 }
 
 @media screen and (max-width: 550px) {
+  .techs {
+    background: #FAFAFA;
+  }
+
   .techs__wraper {
     padding: 70px 18px;
   }

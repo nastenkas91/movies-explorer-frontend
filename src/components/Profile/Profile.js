@@ -57,7 +57,7 @@ function Profile() {
         <button type='button' className="profile__update-btn" onClick={handleUpdateButton}>Редактировать</button>
         <NavLink to='/' className="profile__leave-btn">Выйти из аккаунта</NavLink>
       </div>
-      <button disabled={!formIsValid} type='submit' className={`profile__submit-btn ${!isUpdating && 'profile__btn-wraper_invisible'}
+      <button type="submit" disabled={!formIsValid} type='submit' className={`profile__submit-btn ${!isUpdating && 'profile__btn-wraper_invisible'}
       ${!formIsValid && 'profile__submit-btn_disabled'}`}>Сохранить</button>
     </form>
     </section>

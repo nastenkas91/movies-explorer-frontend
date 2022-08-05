@@ -8,8 +8,8 @@ function SearchForm() {
     <section className="search">
       <form className="search__form">
         <img src={searchIcon} alt="" className="search__icon"/>
-        <input type="text" className="search__input" placeholder={'Фильм'}/>
-        <button className="search__submit-btn"></button>
+        <input type="text" className="search__input" placeholder={'Фильм'} required />
+        <button type="submit" className="search__submit-btn"></button>
       </form>
       <div className="search__line"></div>
       <FilterCheckbox />
