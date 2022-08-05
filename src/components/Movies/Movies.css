@@ -1,0 +1,32 @@
+.movies {
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 90vh;
+}
+
+.movies__more-btn {
+  margin: 50px auto 80px;
+  width: 320px;
+  height: 36px;
+  background:  #F4F4F4;
+  font-size: 12px;
+  line-height: 15px;
+  text-align: center;
+  color: #000000;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.movies__more-btn:hover {
+  opacity: 0.8;
+}
+
+
+@media screen and (max-width: 550px) {
+  .movies__more-btn {
+    width: 240px;
+  }
+}
