@@ -4,11 +4,13 @@ import SearchForm from "../SearchForm/SearchForm";
 import MoviesCardList from "../MoviesCardList/MoviesCardList";
 import { InitialSavedCards} from "../../utils/initialCards";
 
-function SavedMovies() {
+function SavedMovies({ savedMovies, handleMovieDelete, handleCheckboxClick, isShortMovieChecked, handleMovieSearch }) {
+
+
   return (
     <div className="saved-movies">
-      <SearchForm />
-      <MoviesCardList cards={InitialSavedCards} />
+      <SearchForm handleCheckboxClick={handleCheckboxClick} isShortMovieChecked={isShortMovieChecked} handleMovieSearch={handleMovieSearch} />
+      <MoviesCardList cards={savedMovies} handleMovieDelete={handleMovieDelete} />
     </div>
   )
 };

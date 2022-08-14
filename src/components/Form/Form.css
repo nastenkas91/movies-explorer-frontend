@@ -1,4 +1,4 @@
-.form {
+.form__auth {
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -130,7 +130,7 @@ input:disabled {
 }
 
 @media screen and (max-width: 450px) {
-  .form {
+  .form__auth {
     margin: 0 auto;
     min-height: 694px;
     align-items: center;

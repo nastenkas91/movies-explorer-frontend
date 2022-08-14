@@ -1,16 +1,17 @@
 import React from "react";
 import './MoviesCardList.css';
 import MoviesCard from "../MoviesCard/MoviesCard";
+import {moviesUrl} from "../../utils/constants";
 
-function MoviesCardList({ cards }) {
+function MoviesCardList({ cards, handleMovieSaving, handleMovieDelete }) {
   return (
     <ul className="movies__card-list">
       {
-        cards.map(c => (<MoviesCard
-            key={c.id}
-            image={c.image}
-            duration={c.duration}
-            nameRU={c.nameRU}
+        cards.map(movie => (<MoviesCard
+            key={movie.id || movie._id}
+            movie={movie}
+            handleMovieSaving={handleMovieSaving}
+            handleMovieDelete={handleMovieDelete}
           />)
         )}
     </ul>

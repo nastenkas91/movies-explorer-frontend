@@ -1,18 +1,21 @@
 import React from "react";
 import './Form.css';
 import {NavLink} from "react-router-dom";
-import useFormValidation from "../../utils/validateForm";
+import useFormValidation from "../../utils/useFormValidation";
 import HeaderLogo from "../HeaderLogo/HeaderLogo";
 
-function Form({ title, isRegForm, button, spanText, spanBtn, spanBtnLink }) {
-  const { userData, errors, isValid, formIsValid, handleChange } = useFormValidation({});
+function Form({ title, isRegForm, button, spanText, spanBtn, spanBtnLink, handleSubmit }) {
+  const { values, errors, isValid, formIsValid, handleChange } = useFormValidation({});
 
-  function handleSubmit(e) {
+  const onSubmitBtnClick = (e) => {
     e.preventDefault();
+    if (formIsValid) {
+      handleSubmit(values);
+    }
   }
 
   return (
-    <form className='form' onSubmit={handleSubmit} noValidate>
+    <form className='form form__auth' onSubmit={onSubmitBtnClick} noValidate>
       <HeaderLogo />
       <h3 className="form__title">{title}</h3>
         {isRegForm &&
@@ -27,7 +30,7 @@ function Form({ title, isRegForm, button, spanText, spanBtn, spanBtnLink }) {
               id='regName'
               autoFocus={true}
               required
-              value={userData['name'] || ''}
+              value={values['name'] || ''}
               onChange={handleChange}
             />
             <span className='form__error'>{errors.name}</span>
@@ -39,7 +42,7 @@ function Form({ title, isRegForm, button, spanText, spanBtn, spanBtnLink }) {
         name='email'
         id='regEmail'
         required
-        value={userData['email'] || ''}
+        value={values['email'] || ''}
         onChange={handleChange}
       />
       <span className='form__error'>{errors.email}</span>
@@ -51,12 +54,16 @@ function Form({ title, isRegForm, button, spanText, spanBtn, spanBtnLink }) {
         name='password'
         id='regPassword'
         required
-        value={userData['password'] || ''}
+        value={values['password'] || ''}
         onChange={handleChange}
       />
       <span className='form__error'>{errors.password}</span>
       <div className="form__btn-wraper">
-        <button type="submit" className={`form__button ${!formIsValid ? 'form__button_type_disabled' : ''}`}>{button}</button>
+        <button
+          type="submit"
+          className={`form__button ${!formIsValid ? 'form__button_type_disabled' : ''}`}>
+          {button}
+        </button>
         <p className="form__span-login">{spanText}
           <NavLink to={spanBtnLink} className='form__span-btn'>{spanBtn}</NavLink>
         </p>

@@ -4,7 +4,7 @@ import {NavLink, useLocation} from "react-router-dom";
 import Navigation from "../Navigation/Navigation";
 import HeaderLogo from "../HeaderLogo/HeaderLogo";
 
-function Header({ loggedIn }) {
+function Header({ loggedIn, isBurgerMenuOpen, handleMenuState }) {
   let location = useLocation();
 
   return (
@@ -16,8 +16,7 @@ function Header({ loggedIn }) {
       <div className="header__wraper">
 
         {/*меню лэндинга для неавторизованного пользователя*/}
-        {/*{(location.pathname === '/' && !loggedIn)*/}
-        {(location.pathname === '/')
+        {(location.pathname === '/' && !loggedIn)
           &&
           <>
             <HeaderLogo />
@@ -28,15 +27,10 @@ function Header({ loggedIn }) {
           </>
         }
 
-        {/*меню страниц аккаунта для авторизованного пользователя */}
-        {(location.pathname === '/movies'
-          || location.pathname === '/saved-movies'
-          || location.pathname === '/profile') && <Navigation />}
-
         {/*меню лэндинга и страниц аккаунта для авторизованного пользователя tbd после реализации авторизации */}
-        {/*{*/}
-        {/*  loggedIn && <Navigation />*/}
-        {/*}*/}
+        {
+          loggedIn && <Navigation isBurgerMenuOpen={isBurgerMenuOpen}  handleMenuState={handleMenuState} />
+        }
 
       </div>
     </header>

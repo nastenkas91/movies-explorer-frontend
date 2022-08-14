@@ -2,7 +2,8 @@ import React from "react";
 import './Register.css';
 import Form from '../Form/Form';
 
-function Register() {
+function Register({ handleRegister }) {
+
   return (
     <div className="register">
       <Form
@@ -12,6 +13,7 @@ function Register() {
         spanText={'Уже зарегистрированы?'}
         spanBtn={' Войти'}
         spanBtnLink={'/signin'}
+        handleSubmit={handleRegister}
       />
     </div>
   )
