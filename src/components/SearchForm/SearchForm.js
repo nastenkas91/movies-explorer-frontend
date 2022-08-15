@@ -11,7 +11,7 @@ function SearchForm({ handleMovieSearch, isShortMovieChecked, handleCheckboxClic
   function handleSubmit(e) {
     if (formIsValid) {
       e.preventDefault();
-      handleMovieSearch(values.searchRequest);
+      handleMovieSearch(values.searchRequest, isShortMovieChecked);
     }
   }
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
-import './Popup.css'
+import './InfoTooltip.css'
 
-function Popup({ isOpen, onClose, children}) {
+function InfoTooltip({ isOpen, onClose, children}) {
   const popup = useRef()
 
   useEffect(() => {
@@ -33,4 +33,4 @@ function Popup({ isOpen, onClose, children}) {
   )
 }
 
-export default Popup;
+export default InfoTooltip;

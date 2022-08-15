@@ -15,29 +15,42 @@ import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 import * as auth from '../../utils/auth';
 import { mainApi } from '../../utils/MainApi';
 import { moviesApi } from '../../utils/MoviesApi';
-import { shortMovieDuration } from '../../utils/constants';
+import { filterMoviesByTitle, handleDurationFiltration } from '../../utils/utils';
+import {useLocation} from "react-router";
+import {amountOfCards1280, amountOfCards768, amountOfCards480, newRow1280, newRow768, newRow480} from "../../utils/constants";
 
 function App() {
   const [currentUser, setCurrentUser] = useState({});
   const [beatfilmMovies, setBeatfilmMovies] = useState([]);
   const [filteredMovies, setFilteredMovies] = useState([]);
   const [savedMovies, setSavedMovies] = useState([]);
-  const [filteredSavedMovies, setFilteredSavedMovies] = useState([]);
+  const [shownSavedMovies, setShownSavedMovies] = useState([]);
 
   const [isShortMovieChecked, setIsShortMovieChecked] = useState(false);
-  const [isShortInSavedChecked, setIsShortInSavedChecked] = useState(false);
+  const [isSavedShortMovieChecked, setIsSavedShortMovieChecked] = useState(false);
+
   const [request, setRequest] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
 
   const [loggedIn, setLoggedIn] = useState(false);
-  const [authFailed, setAuthFailed] =useState(false);
+
+  const [amountOfCards, setAmountOfCards] = useState(0);
+  const [rowLength, setRowLength] = useState(0);
+  const [isMoreButtonVisible, setIsMoreButtonVisible] = useState(false);
 
   //состояние попапов
   const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState(false);
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+  const [nothingFound, setNothingFound] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    window.addEventListener('resize', checkWindowSize);
+    return () => window.removeEventListener('resize', checkWindowSize);
+  })
 
   useEffect(() => {
     checkToken();
@@ -49,12 +62,13 @@ function App() {
   //проверка токена
   function checkToken() {
     const token = localStorage.getItem('jwt');
+    const pathname = location.pathname;
     if (token) {
       auth.checkToken(token)
         .then((res) => {
           if (res) {
             setLoggedIn(true);
-            navigate('/movies');
+            navigate(pathname);
           } else if (res.message) {
             return res.message
           }
@@ -71,7 +85,9 @@ function App() {
         .then(res => {
           setCurrentUser(res[0]);
           setSavedMovies(res[1]);
+          setShownSavedMovies(res[1])
           localStorage.setItem('savedMovies', JSON.stringify(res[1]));
+          localStorage.setItem('moviesOnSaved', JSON.stringify(res[1]));
         })
         .catch(((err) => {
           console.log(err)
@@ -124,60 +140,42 @@ function App() {
 
   //ПОИСК ФИЛЬМОВ
 
-  //Фильтрация по названию
-  function filterMoviesByTitle(movies, request) {
-    return movies.filter(function(movie) {
-      return movie.nameRU.toLowerCase().indexOf(request.toLowerCase()) > -1
-        || (movie.nameEN && movie.nameEN.toLowerCase().indexOf(request.toLowerCase()) > -1)
-    })
-  }
-
-  //Проверка по длительности
-  function handleDurationFiltration(movies) {
-    return movies.filter(movie => {
-      return movie.duration <= shortMovieDuration;
-    });
-
-  }
-
   //Фильтрация по длительности
-  function handleCheckboxToggle(isShortMoviesOn) {
-    const movies = JSON.parse(localStorage.getItem('movies'));
+  function handleCheckboxToggle(isShortMoviesOn, localStorageName) {
+    const movies = JSON.parse(localStorage.getItem(localStorageName));
 
     if (isShortMoviesOn) {
       let filteredData = handleDurationFiltration(movies);
-      setFilteredMovies(filteredData);
+      if (location.pathname === '/movies') {
+        setFilteredMovies(filteredData);
+      } else if (location.pathname === '/saved-movies') {
+        setShownSavedMovies(filteredData)
+      }
     } else {
-      setFilteredMovies(movies);
+      if (location.pathname === '/movies') {
+        setFilteredMovies(movies);
+      } else if (location.pathname === '/saved-movies') {
+        setShownSavedMovies(movies)
+      }
     }
   }
 
-  function handleCheckboxToggleInSaved(isShortMoviesOn) {
-    const movies = JSON.parse(localStorage.getItem('moviesInSavedByName'));
+  //нажатие на чекбокс
+  function handleCheckboxClick(e) {
+    setIsShortMovieChecked(e.target.checked);
+    handleCheckboxToggle(e.target.checked, 'movies');
+  }
 
-    if (isShortMoviesOn) {
-      let filteredData = handleDurationFiltration(movies);
-      setFilteredSavedMovies(filteredData);
-    } else {
-      setFilteredSavedMovies(movies);
-    }
+  function handleSavedCheckboxClick(e) {
+    setIsSavedShortMovieChecked(e.target.checked);
+    handleCheckboxToggle(e.target.checked, 'moviesOnSaved');
   }
 
   //
-  function handleMovieSearch(movies, request, isShortMovieChecked) {
+  function handleMovieSearch(movies, request, isShortMovieChecked, localStorageName) {
     let filteredData = [];
     filteredData = filterMoviesByTitle(movies, request);
-    localStorage.setItem('movies', JSON.stringify(filteredData));
-    if (isShortMovieChecked) {
-      filteredData = handleDurationFiltration(filteredData);
-    };
-    return filteredData;
-  }
-
-  function handleSavedMovieSearch(movies, request, isShortMovieChecked) {
-    let filteredData = [];
-    filteredData = filterMoviesByTitle(movies, request);
-    localStorage.setItem('moviesInSavedByName', JSON.stringify(filteredData));
+    localStorage.setItem(localStorageName, JSON.stringify(filteredData));
     if (isShortMovieChecked) {
       filteredData = handleDurationFiltration(filteredData);
     };
@@ -185,14 +183,14 @@ function App() {
   }
 
   //Поиск по введеному запросу
-  const searchPromise = (request) => {
+  const searchPromise = (request, isShortMovieChecked) => {
     return new Promise((resolve, reject) => {
       if (beatfilmMovies.length === 0) {
         moviesApi.getMovies()
           .then((res) => {
             setBeatfilmMovies(res);
             localStorage.setItem('beatfilmMovies', JSON.stringify(res));
-            resolve(handleMovieSearch(res, request, isShortMovieChecked))
+            resolve(handleMovieSearch(res, request, isShortMovieChecked, 'movies'))
           })
           .catch(err => {
             console.log(err);
@@ -200,48 +198,41 @@ function App() {
           })
       }
       else {
-        resolve(handleMovieSearch(beatfilmMovies, request, isShortMovieChecked));
+        resolve(handleMovieSearch(beatfilmMovies, request, isShortMovieChecked, 'movies'));
       }
     })
   }
 
-  const savedSearchPromise = (req) => {
-    return new Promise((resolve) => {
-      resolve(handleSavedMovieSearch(savedMovies, req, isShortInSavedChecked))
-    })
-  }
-
-  //чекбокс фильтрации короткометражек
-  function handleCheckboxClick(e) {
-    setIsShortMovieChecked(e.target.checked);
-    handleCheckboxToggle(e.target.checked);
-  }
-
-  function handleCheckboxClickInSaved(e) {
-    setIsShortInSavedChecked(e.target.checked);
-    handleCheckboxToggleInSaved(e.target.checked);
-  }
-
   //Обработчик формы поиска
-  function handleSearch(request) {
+  function handleSearch(request, isShortMovieChecked) {
     setIsLoading(true)
     setRequest(request);
-    searchPromise(request)
+    checkWindowSize();
+    searchPromise(request, isShortMovieChecked)
       .then(res => {
-        setFilteredMovies(res)
+        setFilteredMovies(res);
+        if (res.length > 0) {
+          setNothingFound(false);
+          setIsMoreButtonVisible(res.length > amountOfCards);
+        }
+        else {
+          setNothingFound(true);
+          setIsMoreButtonVisible(false);
+        }
       })
       .catch(err => console.log(err))
       .finally(setIsLoading(false))
   }
 
-  function handleSearchInSavedMovies(req) {
-    setIsLoading(true);
-    savedSearchPromise(req)
-      .then(res => {
-        setFilteredSavedMovies(res)
-      })
-      .catch(err => console.log(err))
-      .finally(setIsLoading(false))
+  function handleSearchInSavedMovies(req, isShortMovieChecked) {
+    const filteredData = handleMovieSearch(savedMovies, req, isShortMovieChecked, 'moviesOnSaved');
+    setShownSavedMovies(filteredData);
+    if (filteredData.length > 0) {
+      setNothingFound(false);
+    }
+    else {
+      setNothingFound(true);
+    }
   }
 
   //Сохранение фильма
@@ -254,6 +245,7 @@ function App() {
           setFilteredMovies(movies => movies.map(m => m.id === res.movieId ? res : m));
           const updatedSavedMovies = [res, ...savedMovies];
           setSavedMovies(updatedSavedMovies);
+          setShownSavedMovies(updatedSavedMovies);
           localStorage.setItem('savedMovies', JSON.stringify(updatedSavedMovies))
         })
         .catch(err => console.log(err))
@@ -269,7 +261,7 @@ function App() {
         const updatedSavedMovies = savedMovies.filter(m => m._id !== deletedMovie._id);
         localStorage.setItem('savedMovies', JSON.stringify(updatedSavedMovies));
         setSavedMovies(updatedSavedMovies);
-
+        setShownSavedMovies(updatedSavedMovies);
         setFilteredMovies(movies => movies.map(m => m._id && m._id === movie._id ? beatfilmMovies.find(m => m.id === movie.movieId) : m));
       })
       .catch(err => console.log(err))
@@ -280,6 +272,38 @@ function App() {
   function handleMenuState() {
     setIsBurgerMenuOpen(!isBurgerMenuOpen);
   }
+
+  //Проверка ширины экрана
+  function checkWindowSize() {
+    let cardsInRow = 0;
+    if (window.innerWidth > 1100) {
+      setAmountOfCards(amountOfCards1280);
+      setRowLength(newRow1280);
+      cardsInRow = newRow1280;
+    }
+    if (window.innerWidth <= 1100 && window.innerWidth > 700) {
+      setAmountOfCards(amountOfCards768);
+      setRowLength(newRow768);
+      cardsInRow = newRow768;
+    }
+    if (window.innerWidth <= 700) {
+      setAmountOfCards(amountOfCards480);
+      setRowLength(newRow480);
+      cardsInRow = newRow480;
+    }
+    setIsMoreButtonVisible(filteredMovies.length > amountOfCards);
+    return cardsInRow;
+  }
+
+  //кнопка "Еще"
+  function handleMoreButtonClick() {
+    const newAmountOfCards = amountOfCards + rowLength;
+    setAmountOfCards(newAmountOfCards);
+    if (filteredMovies.length <= newAmountOfCards) {
+      setIsMoreButtonVisible(false)
+    }
+  }
+
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -304,21 +328,27 @@ function App() {
                 handleMovieSearch={handleSearch}
                 movies={filteredMovies}
                 savedMovies={savedMovies}
-                isShortMovieChecked={isShortMovieChecked}
+                amountOfCards={amountOfCards}
                 handleCheckboxClick={handleCheckboxClick}
+                isShortMovieChecked={isShortMovieChecked}
                 isLoading={isLoading}
                 handleMovieSaving={handleMovieSaving}
                 handleMovieDelete={handleMovieDelete}
+                isMoreButtonVisible={isMoreButtonVisible}
+                handleMoreButtonClick={handleMoreButtonClick}
+                nothingFound={nothingFound}
                 request={request}/>} />
 
             <Route
               path='/saved-movies'
               element={<SavedMovies
-                savedMovies={savedMovies}
+                savedMovies={shownSavedMovies}
                 handleMovieDelete={handleMovieDelete}
+                handleCheckboxClick={handleSavedCheckboxClick}
                 handleMovieSearch={handleSearchInSavedMovies}
-                handleCheckboxClick={handleCheckboxClickInSaved}
-                isShortMovieChecked={isShortInSavedChecked}
+                handleCheckboxToggle={handleCheckboxToggle}
+                isShortMovieChecked={isSavedShortMovieChecked}
+                nothingFound={nothingFound}
               />} />
 
             <Route
