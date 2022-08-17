@@ -144,7 +144,6 @@ input:disabled {
   .form__button {
     font-size: 12px;
     line-height: 15px;
-    margin-top: 200px;
   }
 
   .form__input-label {

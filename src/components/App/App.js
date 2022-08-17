@@ -17,7 +17,16 @@ import { mainApi } from '../../utils/MainApi';
 import { moviesApi } from '../../utils/MoviesApi';
 import { filterMoviesByTitle, handleDurationFiltration } from '../../utils/utils';
 import {useLocation} from "react-router";
-import {amountOfCards1280, amountOfCards768, amountOfCards480, newRow1280, newRow768, newRow480} from "../../utils/constants";
+import {
+  amountOfCards1280,
+  amountOfCards768,
+  amountOfCards480,
+  newRow1280,
+  newRow768,
+  newRow480,
+  successMessage, profileUpdateErrorMessage, conflictingEmailMessage, registrationErrorMessage, authErrorMessage
+} from "../../utils/constants";
+import InfoTooltip from "../InfoTooltip/InfoTooltip";
 
 function App() {
   const [currentUser, setCurrentUser] = useState({});
@@ -41,7 +50,7 @@ function App() {
 
   //состояние попапов
   const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState(false);
-  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+  const [infoTooltip, setInfoTooltip] = useState({isOpen: false, text: '', success: false });
   const [nothingFound, setNothingFound] = useState(false);
 
   const navigate = useNavigate();
@@ -102,7 +111,14 @@ function App() {
         handleLogin({ email, password })
       })
       .catch((err) => {
-        console.log(err)
+        if (err === 'Ошибка: 409') {
+          setInfoTooltip({isOpen: true, text: conflictingEmailMessage, success: false});
+          console.log(err)
+        }
+        else {
+          setInfoTooltip({isOpen: true, text: registrationErrorMessage, success: false});
+          console.log(err)
+        }
       })
   }
 
@@ -116,38 +132,67 @@ function App() {
           navigate('/movies');
         }
       })
+      .catch((err) => {
+        if (err === 'Ошибка: 401') {
+          setInfoTooltip({isOpen: true, text: authErrorMessage, success: false});
+          console.log(err)
+        }
+        else {
+          setInfoTooltip({isOpen: true, text: registrationErrorMessage, success: false});
+          console.log(err)
+        }
+      })
   }
 
   //выход из аккаунта
   function handleLogOut() {
     setLoggedIn(false);
-    localStorage.setItem('jwt', '');
-    localStorage.setItem('beatfilmMovies', '');
-    localStorage.setItem('movies', '');
+    localStorage.clear();
     setBeatfilmMovies([]);
     setFilteredMovies([]);
     setSavedMovies([]);
+    setShownSavedMovies([]);
   }
 
   //обновление профиля
   function handleUpdateProfile({ name, email }) {
     mainApi.editProfileInfo({ name: name, email: email })
-      .then((info) => {
-        setCurrentUser(info);
+      .then((res) => {
+        if (res.message) {
+          console.log(res.message)
+        }
+
+        else if (res) {
+          setCurrentUser({name: res.name, email: res.email});
+          setInfoTooltip({isOpen: true, text: successMessage, success: true})
+        }
+
       })
-      .catch(err => console.log(err))
+      .catch(err => {
+        if (err === 'Ошибка: 409') {
+          setInfoTooltip({isOpen: true, text: conflictingEmailMessage, success: false});
+          console.log(err)
+        }
+        else {
+          setInfoTooltip({isOpen: true, text: profileUpdateErrorMessage, success: false});
+          console.log(err)
+        }
+      })
   }
 
   //ПОИСК ФИЛЬМОВ
 
   //Фильтрация по длительности
   function handleCheckboxToggle(isShortMoviesOn, localStorageName) {
-    const movies = JSON.parse(localStorage.getItem(localStorageName));
+    const movies = JSON.parse(localStorage.getItem(`${localStorageName}`));
 
     if (isShortMoviesOn) {
       let filteredData = handleDurationFiltration(movies);
       if (location.pathname === '/movies') {
         setFilteredMovies(filteredData);
+        if (filteredData.length === 0) {
+          setIsMoreButtonVisible(false);
+        }
       } else if (location.pathname === '/saved-movies') {
         setShownSavedMovies(filteredData)
       }
@@ -175,7 +220,7 @@ function App() {
   function handleMovieSearch(movies, request, isShortMovieChecked, localStorageName) {
     let filteredData = [];
     filteredData = filterMoviesByTitle(movies, request);
-    localStorage.setItem(localStorageName, JSON.stringify(filteredData));
+    localStorage.setItem(`${localStorageName}`, JSON.stringify(filteredData));
     if (isShortMovieChecked) {
       filteredData = handleDurationFiltration(filteredData);
     };
@@ -275,24 +320,19 @@ function App() {
 
   //Проверка ширины экрана
   function checkWindowSize() {
-    let cardsInRow = 0;
     if (window.innerWidth > 1100) {
       setAmountOfCards(amountOfCards1280);
       setRowLength(newRow1280);
-      cardsInRow = newRow1280;
     }
     if (window.innerWidth <= 1100 && window.innerWidth > 700) {
       setAmountOfCards(amountOfCards768);
       setRowLength(newRow768);
-      cardsInRow = newRow768;
     }
     if (window.innerWidth <= 700) {
       setAmountOfCards(amountOfCards480);
       setRowLength(newRow480);
-      cardsInRow = newRow480;
     }
     setIsMoreButtonVisible(filteredMovies.length > amountOfCards);
-    return cardsInRow;
   }
 
   //кнопка "Еще"
@@ -304,6 +344,10 @@ function App() {
     }
   }
 
+  //Закрытие попапа с сообщением
+  function closeTooltip() {
+    setInfoTooltip({isOpen: false, text: '', success: infoTooltip.success});
+  }
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -342,7 +386,8 @@ function App() {
             <Route
               path='/saved-movies'
               element={<SavedMovies
-                savedMovies={shownSavedMovies}
+                savedMovies={savedMovies}
+                shownSavedMovies={shownSavedMovies}
                 handleMovieDelete={handleMovieDelete}
                 handleCheckboxClick={handleSavedCheckboxClick}
                 handleMovieSearch={handleSearchInSavedMovies}
@@ -355,7 +400,6 @@ function App() {
               path='/profile'
               element={<Profile
                 handleLogOut={handleLogOut}
-                userInfo={currentUser}
                 handleUpdateProfile={handleUpdateProfile}/>}
             />
           </Route>
@@ -364,6 +408,8 @@ function App() {
         </Routes>
 
         <Footer />
+
+        <InfoTooltip infoTooltip={infoTooltip} onClose={closeTooltip} />
 
       </div>
     </CurrentUserContext.Provider>

@@ -36,7 +36,7 @@
 }
 
 .card__title {
-  margin: 0 12px 0 0;
+  margin: 0 16px 0 0;
   padding: 0;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -49,8 +49,8 @@
 .card__btn {
   background-size: contain;
   border: none;
-  width: 16px;
-  height: 16px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   box-sizing: border-box;
   cursor: pointer;
@@ -58,7 +58,7 @@
 }
 
 .card__btn_like-off {
-  background: center 2px  / 15px 15px transparent url("../../images/like-icon-disabled.svg") no-repeat;
+  background: center 10px  / 15px 15px transparent url("../../images/like-icon-disabled.svg") no-repeat;
 
 }
 

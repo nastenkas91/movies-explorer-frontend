@@ -1,8 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import './InfoTooltip.css'
+import failLogo from '../../images/fail.svg';
+import successLogo from '../../images/success.svg';
 
-function InfoTooltip({ isOpen, onClose, children}) {
-  const popup = useRef()
+function InfoTooltip({ infoTooltip, onClose }) {
+  const infotooltip = useRef()
+
+  const { isOpen, text, success } = infoTooltip;
 
   useEffect(() => {
     function handleEscClose(e) {
@@ -18,17 +22,21 @@ function InfoTooltip({ isOpen, onClose, children}) {
     }
 
     document.addEventListener('keydown', handleEscClose);
-    popup.current.addEventListener('mousedown', handleOverlayClickClose);
+    infotooltip.current.addEventListener('mousedown', handleOverlayClickClose);
 
     return () => {
-      popup.current.removeEventListener('mousedown', handleOverlayClickClose);
+      infotooltip.current.removeEventListener('mousedown', handleOverlayClickClose);
       document.removeEventListener('keydown', handleEscClose);
     }
   })
 
   return (
-    <div className={`popup ${isOpen ? 'popup_opened' : ''}`} ref={popup}>
-      {children}
+    <div className={`infotooltip ${isOpen ? 'infotooltip_opened' : ''}`} ref={infotooltip}>
+      <div className="infotooltip__container">
+        <button aria-label="Закрыть" type="button" className="infotooltip__close-btn" onClick={onClose} ></button>
+        <img src={success ? successLogo : failLogo} alt='info' className='infotooltip__picture'/>
+        <p className="infotooltip__text">{text}</p>
+      </div>
     </div>
   )
 }

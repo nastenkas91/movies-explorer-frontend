@@ -1,16 +1,19 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import './SavedMovies.css';
 import SearchForm from "../SearchForm/SearchForm";
 import MoviesCardList from "../MoviesCardList/MoviesCardList";
 import { InitialSavedCards} from "../../utils/initialCards";
 
-function SavedMovies({ savedMovies, handleMovieDelete, handleCheckboxClick, handleMovieSearch, isShortMovieChecked, nothingFound }) {
+function SavedMovies({ savedMovies, shownSavedMovies, handleMovieDelete, handleCheckboxClick, handleMovieSearch, isShortMovieChecked, nothingFound }) {
 
+  // useEffect(() => {
+  //   shownSavedMovies = savedMovies
+  // }, [])
 
   return (
     <div className="saved-movies">
       <SearchForm handleCheckboxClick={handleCheckboxClick} isShortMovieChecked={isShortMovieChecked} handleMovieSearch={handleMovieSearch} />
-      <MoviesCardList cards={savedMovies} handleMovieDelete={handleMovieDelete} nothingFound={nothingFound} />
+      <MoviesCardList cards={shownSavedMovies} handleMovieDelete={handleMovieDelete} nothingFound={nothingFound} />
     </div>
   )
 };

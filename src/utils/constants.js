@@ -8,6 +8,17 @@ export const searchErrorMessage = 'Во время запроса произош
 
 export const notFoundMessage = 'Ничего не найдено';
 
+export const successMessage = 'Данные сохранены!';
+
+export const authErrorMessage = 'Вы ввели неправильный логин или пароль.';
+
+export const conflictingEmailMessage = 'Пользователь с таким email уже существует.';
+export const registrationErrorMessage = 'При регистрации пользователя произошла ошибка.';
+
+export const profileUpdateErrorMessage = 'При обновлении профиля произошла ошибка.';
+
+export const serverErrorMessage = '500 На сервере произошла ошибка.';
+
 export const amountOfCards1280 = 12;
 export const amountOfCards768 = 8;
 export const amountOfCards480 = 5;

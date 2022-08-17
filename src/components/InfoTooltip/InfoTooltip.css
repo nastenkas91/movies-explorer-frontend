@@ -1,4 +1,4 @@
-.popup {
+.infotooltip {
   background: rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
@@ -14,7 +14,75 @@
   z-index: 10;
 }
 
-.popup_opened {
+.infotooltip_opened {
   visibility: visible;
   opacity: 1
+}
+
+.infotooltip__container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  box-sizing: border-box;
+  width: 430px;
+  min-height: 330px;
+  background: #fff;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  align-items: center;
+  margin: 0;
+  padding: 60px 36px;
+}
+
+.infotooltip__close-btn {
+  width: 32px;
+  height: 32px;
+  background: transparent url(../../images/CloseIcon.svg) center / cover no-repeat;
+  align-self: flex-end;
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity 1s;
+}
+
+.infotooltip__close-btn:hover {
+  opacity: 0.7;
+}
+
+.infotooltip__picture {
+  width: 120px;
+  height: 120px;
+  object-position: center;
+  object-fit: cover;
+}
+
+.infotooltip__text {
+  margin: 0;
+  padding: 0;
+}
+
+@media screen and (max-width: 530px) {
+  .infotooltip__close-btn {
+    right: 0;
+    top: -48px;
+  }
+
+  .infotooltip__container {
+    width: 280px;
+    min-height: 308px;
+    padding: 50px 18px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .infotooltip__close-btn {
+    top: -36px;
+    right: 0;
+    width: 20px;
+    height: 20px;
+  }
 }

@@ -1,12 +1,19 @@
-import React, { useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 import './Profile.css';
 import {NavLink} from "react-router-dom";
 import useFormValidation from "../../utils/useFormValidation";
+import { CurrentUserContext } from "../../contexts/CurrentUserContext";
 
-function Profile({ handleLogOut, userInfo, handleUpdateProfile }) {
-  const { values, errors, isValid, formIsValid, handleChange } = useFormValidation({name: userInfo.name, email: userInfo.email});
+function Profile({ handleLogOut, handleUpdateProfile }) {
+  const currentUser = useContext(CurrentUserContext);
+
+  const { values, setValues, errors, isValid, formIsValid, handleChange } = useFormValidation({ name: currentUser.name, email: currentUser.email});
   const [isUpdating, setIsUpdating] = useState(false);
   const [isInputDisabled, setIsInputDisabled] =useState(true);
+
+  useEffect(() => {
+    setValues({name: currentUser.name, email: currentUser.email});
+  }, [currentUser, setValues])
 
   function handleUpdateButton() {
     setIsUpdating(true);
@@ -17,12 +24,12 @@ function Profile({ handleLogOut, userInfo, handleUpdateProfile }) {
     e.preventDefault();
     setIsUpdating(false);
     setIsInputDisabled(true);
-    handleUpdateProfile({ name: values.name, email: values.email});
+    handleUpdateProfile({ name: values.name, email: values.email})
   }
   return (
     <section className="profile">
       <form className="form profile__form" onSubmit={handleSubmit} noValidate>
-      <h2 className="profile__title">Привет, {values.name}!</h2>
+      <h2 className="profile__title">Привет, {currentUser.name}!</h2>
       <div className="profile__input-wraper">
         <p className="profile__input-placeholder">Имя</p>
         <input
@@ -32,7 +39,7 @@ function Profile({ handleLogOut, userInfo, handleUpdateProfile }) {
           required
           minLength='2'
           maxLength='30'
-          value={values.name}
+          value={values.name || ''}
           onChange={handleChange}
           disabled={isInputDisabled}
         />
@@ -46,7 +53,7 @@ function Profile({ handleLogOut, userInfo, handleUpdateProfile }) {
           type="email"
           className="profile__input"
           required
-          value={values.email}
+          value={values.email || ''}
           onChange={handleChange}
           disabled={isInputDisabled}
         />
