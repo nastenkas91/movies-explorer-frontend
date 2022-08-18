@@ -14,17 +14,7 @@ function useFormValidation(currentValues) {
     setFormIsValid(e.target.closest('.form').checkValidity())
   }
 
-  // const resetForm = useCallback(
-  //   (newValues = {}, newErrors = {}, newIsValid = false, newFormIsValid = false) => {
-  //     setValues(newValues);
-  //     setErrors(newErrors);
-  //     setIsValid(newIsValid);
-  //     setFormIsValid(newFormIsValid);
-  //   },
-  //   [setValues, setErrors, setIsValid, setFormIsValid()]
-  // );
-
-  return { values, setValues, errors, isValid, formIsValid, handleChange };
+  return { values, setValues, errors, isValid, formIsValid, setFormIsValid, handleChange };
 }
 
 export default useFormValidation;

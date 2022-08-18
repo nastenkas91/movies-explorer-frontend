@@ -7,17 +7,27 @@ import { CurrentUserContext } from "../../contexts/CurrentUserContext";
 function Profile({ handleLogOut, handleUpdateProfile }) {
   const currentUser = useContext(CurrentUserContext);
 
-  const { values, setValues, errors, isValid, formIsValid, handleChange } = useFormValidation({ name: currentUser.name, email: currentUser.email});
+  const { values, setValues, errors, formIsValid, setFormIsValid, handleChange } = useFormValidation({ name: currentUser.name, email: currentUser.email});
   const [isUpdating, setIsUpdating] = useState(false);
   const [isInputDisabled, setIsInputDisabled] =useState(true);
 
   useEffect(() => {
     setValues({name: currentUser.name, email: currentUser.email});
-  }, [currentUser, setValues])
+    setIsUpdating(false);
+    setIsInputDisabled(true);
+  }, [currentUser, setValues, handleUpdateProfile])
+
+  //введённая информация соответствует текущим данным пользователя
+  useEffect(() => {
+    if (values.name === currentUser.name && values.email === currentUser.email) {
+      setFormIsValid(false);
+    }
+  }, [values])
 
   function handleUpdateButton() {
     setIsUpdating(true);
     setIsInputDisabled(false);
+    setFormIsValid(false);
   }
 
   function handleSubmit(e) {
@@ -26,6 +36,7 @@ function Profile({ handleLogOut, handleUpdateProfile }) {
     setIsInputDisabled(true);
     handleUpdateProfile({ name: values.name, email: values.email})
   }
+
   return (
     <section className="profile">
       <form className="form profile__form" onSubmit={handleSubmit} noValidate>

@@ -4,7 +4,7 @@ export const moviesUrl = 'https://api.nomoreparties.co';
 
 export const shortMovieDuration = 40;
 
-export const searchErrorMessage = 'Во время запроса произошла ошибка. Возможно, проблема с соединением или сервер недоступен. Подождите немного и попробуйте ещё раз';
+export const commonErrorMessage = 'Во время запроса произошла ошибка. Возможно, проблема с соединением или сервер недоступен. Подождите немного и попробуйте ещё раз';
 
 export const notFoundMessage = 'Ничего не найдено';
 

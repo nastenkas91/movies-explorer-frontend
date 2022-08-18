@@ -8,7 +8,7 @@ function MoviesCardList({ cards, handleMovieSaving, handleMovieDelete, amountOfC
   return (
     <>
       {
-        nothingFound ?
+        (nothingFound || cards.length === 0) ?
           <div className={'movies__card-list_empty'}>{notFoundMessage}</div>
           :
           <ul className="movies__card-list">

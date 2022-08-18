@@ -3,12 +3,21 @@ import './SavedMovies.css';
 import SearchForm from "../SearchForm/SearchForm";
 import MoviesCardList from "../MoviesCardList/MoviesCardList";
 import { InitialSavedCards} from "../../utils/initialCards";
+import {useLocation} from "react-router-dom";
 
-function SavedMovies({ shownSavedMovies, handleMovieDelete, handleCheckboxToggle, handleMovieSearch, nothingFound }) {
+function SavedMovies({ handleMovieDelete, handleMovieSearch, shownSavedMovies, setShownSavedMovies, checkWindowSize, nothingFound }) {
+
+  useEffect(() => {
+    if (localStorage.getItem('savedMovies')) {
+      checkWindowSize();
+      const previousResult = JSON.parse(localStorage.getItem('savedMovies'));
+      setShownSavedMovies(previousResult);
+    }
+  }, [])
 
   return (
     <div className="saved-movies">
-      <SearchForm handleCheckboxToggle={handleCheckboxToggle} handleMovieSearch={handleMovieSearch} />
+      <SearchForm handleMovieSearch={handleMovieSearch} setShownSavedMovies={setShownSavedMovies} />
       <MoviesCardList cards={shownSavedMovies} handleMovieDelete={handleMovieDelete} nothingFound={nothingFound} />
     </div>
   )

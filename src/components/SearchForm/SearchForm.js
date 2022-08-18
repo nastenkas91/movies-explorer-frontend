@@ -2,18 +2,27 @@ import React, {useEffect, useState} from "react";
 import './SearchForm.css';
 import searchIcon from '../../images/search-icon.svg';
 import {useLocation} from "react-router-dom";
+import {handleDurationFiltration} from "../../utils/utils";
 
-function SearchForm({ handleMovieSearch, handleCheckboxToggle }) {
+function SearchForm({ handleMovieSearch, setFilteredMovies, setShownSavedMovies }) {
   const location = useLocation();
   const [request, setRequest] = useState('')
   const [isShortMovieChecked, setIsShortMovieChecked] = useState(false);
   const [error, setError] = useState('');
-  const [formIsValid, setFormIsValid] = useState(false);
+  const [isValid, setIsValid] = useState(false);
 
   function handleChange(e) {
-    setRequest(e.target.value);
-    setError(e.target.validationMessage);
-    setFormIsValid(e.target.closest('.form').checkValidity())
+    const input = e.target;
+    setRequest(input.value);
+    setIsValid(input.validity.valid);
+    if (!input.validity.valid && input.value.length === 0) {
+      setError('Нужно ввести ключевое слово');
+    }
+    else if (!input.validity.valid) {
+      setError(input.validationMessage)
+    } else {
+      setError('')
+    }
   }
 
   useEffect(() => {
@@ -21,9 +30,31 @@ function SearchForm({ handleMovieSearch, handleCheckboxToggle }) {
       const prevReq = JSON.parse(localStorage.getItem('request'));
       setRequest(prevReq);
       setIsShortMovieChecked(JSON.parse(localStorage.getItem('shortMovieChecked')));
-      //handleMovieSearch(JSON.parse(localStorage.getItem('request')), JSON.parse(localStorage.getItem('shortMovieChecked')))
     }
   }, [])
+
+  //Фильтрация по длительности
+  function handleCheckboxToggle(isShortMoviesOn, localStorageName) {
+    const movies = JSON.parse(localStorage.getItem(`${localStorageName}`));
+
+    if (isShortMoviesOn) {
+      let filteredData = handleDurationFiltration(movies);
+      if (location.pathname === '/movies') {
+        setFilteredMovies(filteredData);
+      }
+      else if (location.pathname === '/saved-movies') {
+        setShownSavedMovies(filteredData)
+      }
+    }
+
+    else {
+      if (location.pathname === '/movies') {
+        setFilteredMovies(movies);
+      } else if (location.pathname === '/saved-movies') {
+        setShownSavedMovies(movies)
+      }
+    }
+  }
 
   function handleCheckboxClick(e) {
     setIsShortMovieChecked(e.target.checked);
@@ -33,10 +64,11 @@ function SearchForm({ handleMovieSearch, handleCheckboxToggle }) {
     } else if (location.pathname === '/saved-movies') {
       handleCheckboxToggle(e.target.checked, 'moviesOnSaved');
     }
+    setIsShortMovieChecked(e.target.checked);
   }
 
   function handleSubmit(e) {
-    if (formIsValid) {
+    if (isValid) {
       e.preventDefault();
       handleMovieSearch(request, isShortMovieChecked);
       if (location.pathname === '/movies') {
@@ -58,7 +90,8 @@ function SearchForm({ handleMovieSearch, handleCheckboxToggle }) {
           value={request}
           onChange={handleChange}
           required />
-        <button type="submit" className='search__submit-btn' disabled={!formIsValid}></button>
+        <button type="submit" className='search__submit-btn' disabled={!isValid}></button>
+
       </form>
       <span className='search__error'>{error}</span>
       <div className="search__line"></div>

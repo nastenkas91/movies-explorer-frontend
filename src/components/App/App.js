@@ -24,7 +24,12 @@ import {
   newRow1280,
   newRow768,
   newRow480,
-  successMessage, profileUpdateErrorMessage, conflictingEmailMessage, registrationErrorMessage, authErrorMessage
+  successMessage,
+  profileUpdateErrorMessage,
+  conflictingEmailMessage,
+  registrationErrorMessage,
+  authErrorMessage,
+  commonErrorMessage
 } from "../../utils/constants";
 import InfoTooltip from "../InfoTooltip/InfoTooltip";
 
@@ -36,15 +41,11 @@ function App() {
   const [shownSavedMovies, setShownSavedMovies] = useState([]);
   const [loggedIn, setLoggedIn] = useState(false);
 
-  // const [isShortMovieChecked, setIsShortMovieChecked] = useState(false);
-  const [isSavedShortMovieChecked, setIsSavedShortMovieChecked] = useState(false);
-
   const [isLoading, setIsLoading] = useState(false);
-
+  const [isUpdateSuccessful, setIsUpdateSuccessful] = useState(true);
 
   const [amountOfCards, setAmountOfCards] = useState(0);
   const [rowLength, setRowLength] = useState(0);
-  const [isMoreButtonVisible, setIsMoreButtonVisible] = useState(false);
 
   //состояние попапов и сообщений
   const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState(false);
@@ -57,7 +58,7 @@ function App() {
   useEffect(() => {
     window.addEventListener('resize', checkWindowSize);
     return () => window.removeEventListener('resize', checkWindowSize);
-  })
+  }, )
 
   useEffect(() => {
     checkToken();
@@ -85,7 +86,7 @@ function App() {
     }
   }
 
-  //
+  //получение данных пользователя
   useEffect(() => {
     if(loggedIn) {
       Promise.all([mainApi.getUserInfo(), mainApi.getMovies()])
@@ -122,6 +123,7 @@ function App() {
 
   //авторизация
   function handleLogin({ email, password }) {
+    setIsLoading(true);
     auth.login(email, password)
       .then((res) => {
         if (res.token) {
@@ -140,33 +142,28 @@ function App() {
           console.log(err)
         }
       })
+      .finally(setIsLoading(false))
   }
 
   //выход из аккаунта
   function handleLogOut() {
     setLoggedIn(false);
     localStorage.clear();
-    setBeatfilmMovies([]);
-    setFilteredMovies([]);
-    setSavedMovies([]);
-    setShownSavedMovies([]);
   }
 
   //обновление профиля
   function handleUpdateProfile({ name, email }) {
     mainApi.editProfileInfo({ name: name, email: email })
       .then((res) => {
-        if (res.message) {
-          console.log(res.message)
-        }
-
-        else if (res) {
+        if (res) {
+          setIsUpdateSuccessful(true);
           setCurrentUser({name: res.name, email: res.email});
           setInfoTooltip({isOpen: true, text: successMessage, success: true})
         }
 
       })
       .catch(err => {
+        setIsUpdateSuccessful(false);
         if (err === 'Ошибка: 409') {
           setInfoTooltip({isOpen: true, text: conflictingEmailMessage, success: false});
           console.log(err)
@@ -179,54 +176,9 @@ function App() {
   }
 
   //ПОИСК ФИЛЬМОВ
-
-  //Фильтрация по длительности
-  function handleCheckboxToggle(isShortMoviesOn, localStorageName) {
-    const movies = JSON.parse(localStorage.getItem(`${localStorageName}`));
-
-    if (isShortMoviesOn) {
-      let filteredData = handleDurationFiltration(movies);
-
-      if (location.pathname === '/movies') {
-        setFilteredMovies(filteredData);
-        if (filteredData.length === 0) {
-          setIsMoreButtonVisible(false);
-        }
-      }
-      else if (location.pathname === '/saved-movies') {
-        setShownSavedMovies(filteredData)
-        if (filteredData.length === 0) {
-          setIsMoreButtonVisible(false);
-        }
-      }
-    }
-
-    else {
-      if (location.pathname === '/movies') {
-        setFilteredMovies(movies);
-      } else if (location.pathname === '/saved-movies') {
-        setShownSavedMovies(movies)
-      }
-    }
-  }
-
-  //нажатие на чекбокс
-  // function handleCheckboxClick(e) {
-  //   setIsShortMovieChecked(e.target.checked);
-  //   handleCheckboxToggle(e.target.checked, 'movies');
-  // }
-
-  // function handleSavedCheckboxClick(e) {
-  //   setIsSavedShortMovieChecked(e.target.checked);
-  //   handleCheckboxToggle(e.target.checked, 'moviesOnSaved');
-  // }
-
-  //
+  //Поиск по введеному запросу
   function handleMovieSearch(movies, request, isShortMovieChecked, localStorageName) {
     let filteredData = filterMoviesByTitle(movies, request);
-    if (filteredData.length <= amountOfCards) {
-      setIsMoreButtonVisible(false)
-    }
     localStorage.setItem(`${localStorageName}`, JSON.stringify(filteredData));
     if (isShortMovieChecked) {
       filteredData = handleDurationFiltration(filteredData);
@@ -234,7 +186,7 @@ function App() {
     return filteredData;
   }
 
-  //Поиск по введеному запросу
+  //Промис приска на странице movies
   const searchPromise = (request, isShortMovieChecked) => {
     return new Promise((resolve, reject) => {
       if (beatfilmMovies.length === 0) {
@@ -255,7 +207,7 @@ function App() {
     })
   }
 
-  //Обработчик формы поиска
+  //Обработчик формы поиска по всем фильмам
   function handleSearch(request, isShortMovieChecked) {
     setIsLoading(true)
     checkWindowSize();
@@ -265,17 +217,19 @@ function App() {
         localStorage.setItem('filteredMovies', JSON.stringify(res));
         if (res.length > 0) {
           setNothingFound(false);
-          setIsMoreButtonVisible(res.length > amountOfCards);
         }
         else {
           setNothingFound(true);
-          setIsMoreButtonVisible(false);
         }
       })
-      .catch(err => console.log(err))
+      .catch(err => {
+        console.log(err);
+        setInfoTooltip({isOpen: true, text: commonErrorMessage, success: false});
+      })
       .finally(setIsLoading(false))
   }
 
+  //Обработчик формы поиска по сохраненным фильмам
   function handleSearchInSavedMovies(req, isShortMovieChecked) {
     const filteredData = handleMovieSearch(savedMovies, req, isShortMovieChecked, 'moviesOnSaved');
     setShownSavedMovies(filteredData);
@@ -300,7 +254,10 @@ function App() {
           setShownSavedMovies(updatedSavedMovies);
           localStorage.setItem('savedMovies', JSON.stringify(updatedSavedMovies))
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+          console.log(err);
+          setInfoTooltip({isOpen: true, text: commonErrorMessage, success: false});
+        })
         .finally(setIsLoading(false))
     }
   }
@@ -316,7 +273,10 @@ function App() {
         setShownSavedMovies(updatedSavedMovies);
         setFilteredMovies(movies => movies.map(m => m._id && m._id === movie._id ? beatfilmMovies.find(m => m.id === movie.movieId) : m));
       })
-      .catch(err => console.log(err))
+      .catch(err => {
+        console.log(err);
+        setInfoTooltip({isOpen: true, text: commonErrorMessage, success: false});
+      })
       .finally(setIsLoading(false))
   }
 
@@ -339,17 +299,8 @@ function App() {
       setAmountOfCards(amountOfCards480);
       setRowLength(newRow480);
     }
-    setIsMoreButtonVisible(filteredMovies.length > amountOfCards);
   }
 
-  //кнопка "Еще"
-  function handleMoreButtonClick() {
-    const newAmountOfCards = amountOfCards + rowLength;
-    setAmountOfCards(newAmountOfCards);
-    if (filteredMovies.length <= newAmountOfCards) {
-      setIsMoreButtonVisible(false)
-    }
-  }
 
   //Закрытие попапа с сообщением
   function closeTooltip() {
@@ -379,14 +330,13 @@ function App() {
                 handleMovieSearch={handleSearch}
                 filteredMovies={filteredMovies}
                 setFilteredMovies={setFilteredMovies}
-                savedMovies={savedMovies}
+                checkWindowSize={checkWindowSize}
                 amountOfCards={amountOfCards}
-                handleCheckboxToggle={handleCheckboxToggle}
+                setAmountOfCards={setAmountOfCards}
+                rowLength={rowLength}
                 isLoading={isLoading}
                 handleMovieSaving={handleMovieSaving}
                 handleMovieDelete={handleMovieDelete}
-                isMoreButtonVisible={isMoreButtonVisible}
-                handleMoreButtonClick={handleMoreButtonClick}
                 nothingFound={nothingFound}/>} />
 
             <Route
@@ -394,18 +344,18 @@ function App() {
               element={<SavedMovies
                 savedMovies={savedMovies}
                 shownSavedMovies={shownSavedMovies}
+                setShownSavedMovies={setShownSavedMovies}
                 handleMovieDelete={handleMovieDelete}
                 handleMovieSearch={handleSearchInSavedMovies}
-                handleCheckboxToggle={handleCheckboxToggle}
-                isShortMovieChecked={isSavedShortMovieChecked}
                 nothingFound={nothingFound}
+                checkWindowSize={checkWindowSize}
               />} />
 
             <Route
               path='/profile'
               element={<Profile
                 handleLogOut={handleLogOut}
-                handleUpdateProfile={handleUpdateProfile}/>}
+                handleUpdateProfile={handleUpdateProfile} />}
             />
           </Route>
 
