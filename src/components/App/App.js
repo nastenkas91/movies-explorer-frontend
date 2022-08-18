@@ -42,7 +42,6 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isUpdateSuccessful, setIsUpdateSuccessful] = useState(true);
 
   const [amountOfCards, setAmountOfCards] = useState(0);
   const [rowLength, setRowLength] = useState(0);
@@ -156,14 +155,12 @@ function App() {
     mainApi.editProfileInfo({ name: name, email: email })
       .then((res) => {
         if (res) {
-          setIsUpdateSuccessful(true);
           setCurrentUser({name: res.name, email: res.email});
           setInfoTooltip({isOpen: true, text: successMessage, success: true})
         }
 
       })
       .catch(err => {
-        setIsUpdateSuccessful(false);
         if (err === 'Ошибка: 409') {
           setInfoTooltip({isOpen: true, text: conflictingEmailMessage, success: false});
           console.log(err)

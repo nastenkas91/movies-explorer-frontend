@@ -2,8 +2,6 @@ import React, {useEffect, useState} from "react";
 import './SavedMovies.css';
 import SearchForm from "../SearchForm/SearchForm";
 import MoviesCardList from "../MoviesCardList/MoviesCardList";
-import { InitialSavedCards} from "../../utils/initialCards";
-import {useLocation} from "react-router-dom";
 
 function SavedMovies({ handleMovieDelete, handleMovieSearch, shownSavedMovies, setShownSavedMovies, checkWindowSize, nothingFound }) {
 
