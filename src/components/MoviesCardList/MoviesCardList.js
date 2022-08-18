@@ -4,6 +4,7 @@ import MoviesCard from "../MoviesCard/MoviesCard";
 import { notFoundMessage} from "../../utils/constants";
 
 function MoviesCardList({ cards, handleMovieSaving, handleMovieDelete, amountOfCards, nothingFound }) {
+
   return (
     <>
       {

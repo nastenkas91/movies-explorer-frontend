@@ -34,21 +34,19 @@ function App() {
   const [filteredMovies, setFilteredMovies] = useState([]);
   const [savedMovies, setSavedMovies] = useState([]);
   const [shownSavedMovies, setShownSavedMovies] = useState([]);
+  const [loggedIn, setLoggedIn] = useState(false);
 
-  const [isShortMovieChecked, setIsShortMovieChecked] = useState(false);
+  // const [isShortMovieChecked, setIsShortMovieChecked] = useState(false);
   const [isSavedShortMovieChecked, setIsSavedShortMovieChecked] = useState(false);
-
-  const [request, setRequest] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [loggedIn, setLoggedIn] = useState(false);
 
   const [amountOfCards, setAmountOfCards] = useState(0);
   const [rowLength, setRowLength] = useState(0);
   const [isMoreButtonVisible, setIsMoreButtonVisible] = useState(false);
 
-  //состояние попапов
+  //состояние попапов и сообщений
   const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState(false);
   const [infoTooltip, setInfoTooltip] = useState({isOpen: false, text: '', success: false });
   const [nothingFound, setNothingFound] = useState(false);
@@ -188,15 +186,22 @@ function App() {
 
     if (isShortMoviesOn) {
       let filteredData = handleDurationFiltration(movies);
+
       if (location.pathname === '/movies') {
         setFilteredMovies(filteredData);
         if (filteredData.length === 0) {
           setIsMoreButtonVisible(false);
         }
-      } else if (location.pathname === '/saved-movies') {
-        setShownSavedMovies(filteredData)
       }
-    } else {
+      else if (location.pathname === '/saved-movies') {
+        setShownSavedMovies(filteredData)
+        if (filteredData.length === 0) {
+          setIsMoreButtonVisible(false);
+        }
+      }
+    }
+
+    else {
       if (location.pathname === '/movies') {
         setFilteredMovies(movies);
       } else if (location.pathname === '/saved-movies') {
@@ -206,20 +211,22 @@ function App() {
   }
 
   //нажатие на чекбокс
-  function handleCheckboxClick(e) {
-    setIsShortMovieChecked(e.target.checked);
-    handleCheckboxToggle(e.target.checked, 'movies');
-  }
+  // function handleCheckboxClick(e) {
+  //   setIsShortMovieChecked(e.target.checked);
+  //   handleCheckboxToggle(e.target.checked, 'movies');
+  // }
 
-  function handleSavedCheckboxClick(e) {
-    setIsSavedShortMovieChecked(e.target.checked);
-    handleCheckboxToggle(e.target.checked, 'moviesOnSaved');
-  }
+  // function handleSavedCheckboxClick(e) {
+  //   setIsSavedShortMovieChecked(e.target.checked);
+  //   handleCheckboxToggle(e.target.checked, 'moviesOnSaved');
+  // }
 
   //
   function handleMovieSearch(movies, request, isShortMovieChecked, localStorageName) {
-    let filteredData = [];
-    filteredData = filterMoviesByTitle(movies, request);
+    let filteredData = filterMoviesByTitle(movies, request);
+    if (filteredData.length <= amountOfCards) {
+      setIsMoreButtonVisible(false)
+    }
     localStorage.setItem(`${localStorageName}`, JSON.stringify(filteredData));
     if (isShortMovieChecked) {
       filteredData = handleDurationFiltration(filteredData);
@@ -251,11 +258,11 @@ function App() {
   //Обработчик формы поиска
   function handleSearch(request, isShortMovieChecked) {
     setIsLoading(true)
-    setRequest(request);
     checkWindowSize();
     searchPromise(request, isShortMovieChecked)
       .then(res => {
         setFilteredMovies(res);
+        localStorage.setItem('filteredMovies', JSON.stringify(res));
         if (res.length > 0) {
           setNothingFound(false);
           setIsMoreButtonVisible(res.length > amountOfCards);
@@ -370,18 +377,17 @@ function App() {
               path='/movies'
               element={<Movies
                 handleMovieSearch={handleSearch}
-                movies={filteredMovies}
+                filteredMovies={filteredMovies}
+                setFilteredMovies={setFilteredMovies}
                 savedMovies={savedMovies}
                 amountOfCards={amountOfCards}
-                handleCheckboxClick={handleCheckboxClick}
-                isShortMovieChecked={isShortMovieChecked}
+                handleCheckboxToggle={handleCheckboxToggle}
                 isLoading={isLoading}
                 handleMovieSaving={handleMovieSaving}
                 handleMovieDelete={handleMovieDelete}
                 isMoreButtonVisible={isMoreButtonVisible}
                 handleMoreButtonClick={handleMoreButtonClick}
-                nothingFound={nothingFound}
-                request={request}/>} />
+                nothingFound={nothingFound}/>} />
 
             <Route
               path='/saved-movies'
@@ -389,7 +395,6 @@ function App() {
                 savedMovies={savedMovies}
                 shownSavedMovies={shownSavedMovies}
                 handleMovieDelete={handleMovieDelete}
-                handleCheckboxClick={handleSavedCheckboxClick}
                 handleMovieSearch={handleSearchInSavedMovies}
                 handleCheckboxToggle={handleCheckboxToggle}
                 isShortMovieChecked={isSavedShortMovieChecked}

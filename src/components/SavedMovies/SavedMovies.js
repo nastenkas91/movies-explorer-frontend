@@ -4,15 +4,11 @@ import SearchForm from "../SearchForm/SearchForm";
 import MoviesCardList from "../MoviesCardList/MoviesCardList";
 import { InitialSavedCards} from "../../utils/initialCards";
 
-function SavedMovies({ savedMovies, shownSavedMovies, handleMovieDelete, handleCheckboxClick, handleMovieSearch, isShortMovieChecked, nothingFound }) {
-
-  // useEffect(() => {
-  //   shownSavedMovies = savedMovies
-  // }, [])
+function SavedMovies({ shownSavedMovies, handleMovieDelete, handleCheckboxToggle, handleMovieSearch, nothingFound }) {
 
   return (
     <div className="saved-movies">
-      <SearchForm handleCheckboxClick={handleCheckboxClick} isShortMovieChecked={isShortMovieChecked} handleMovieSearch={handleMovieSearch} />
+      <SearchForm handleCheckboxToggle={handleCheckboxToggle} handleMovieSearch={handleMovieSearch} />
       <MoviesCardList cards={shownSavedMovies} handleMovieDelete={handleMovieDelete} nothingFound={nothingFound} />
     </div>
   )
