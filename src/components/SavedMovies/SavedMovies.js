@@ -1,14 +1,22 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import './SavedMovies.css';
 import SearchForm from "../SearchForm/SearchForm";
 import MoviesCardList from "../MoviesCardList/MoviesCardList";
-import { InitialSavedCards} from "../../utils/initialCards";
 
-function SavedMovies() {
+function SavedMovies({ handleMovieDelete, handleMovieSearch, shownSavedMovies, setShownSavedMovies, checkWindowSize, nothingFound }) {
+
+  useEffect(() => {
+    if (localStorage.getItem('savedMovies')) {
+      checkWindowSize();
+      const previousResult = JSON.parse(localStorage.getItem('savedMovies'));
+      setShownSavedMovies(previousResult);
+    }
+  }, [])
+
   return (
     <div className="saved-movies">
-      <SearchForm />
-      <MoviesCardList cards={InitialSavedCards} />
+      <SearchForm handleMovieSearch={handleMovieSearch} setShownSavedMovies={setShownSavedMovies} />
+      <MoviesCardList cards={shownSavedMovies} handleMovieDelete={handleMovieDelete} nothingFound={nothingFound} />
     </div>
   )
 };

@@ -1,15 +1,37 @@
-import React from "react";
+import React, {useEffect} from "react";
 import './Movies.css';
 import SearchForm from "../SearchForm/SearchForm";
 import MoviesCardList from "../MoviesCardList/MoviesCardList";
-import { InitialCards } from "../../utils/initialCards";
+import Preloader from "../Preloader/Preloader";
+import {useLocation} from "react-router-dom";
 
-function Movies() {
+function Movies({ handleMovieSearch, isLoading, handleMovieSaving, handleMovieDelete, checkWindowSize, amountOfCards, setAmountOfCards, rowLength, filteredMovies, setFilteredMovies, nothingFound  }) {
+  const location = useLocation();
+
+  //кнопка "Еще"
+  function handleMoreButtonClick() {
+    const newAmountOfCards = amountOfCards + rowLength;
+    setAmountOfCards(newAmountOfCards);
+  }
+
+  useEffect(() => {
+    if (localStorage.getItem('filteredMovies')) {
+      checkWindowSize();
+      const previousResult = JSON.parse(localStorage.getItem('filteredMovies'));
+      setFilteredMovies(previousResult);
+    }
+  }, [])
+
   return (
     <section className="movies">
-      <SearchForm />
-      <MoviesCardList cards={InitialCards} />
-      <button type="button" className="movies__more-btn">Ещё</button>
+      <SearchForm handleMovieSearch={handleMovieSearch} setFilteredMovies={setFilteredMovies} />
+      { isLoading && <Preloader/> }
+      <MoviesCardList cards={filteredMovies} handleMovieSaving={handleMovieSaving} handleMovieDelete={handleMovieDelete} amountOfCards={amountOfCards} nothingFound={nothingFound} />
+      {
+        (location.pathname === '/movies' && filteredMovies.length > amountOfCards)
+        &&
+        <button type="button" className={`movies__more-btn movies__more-btn_visible`} onClick={handleMoreButtonClick} >Ещё</button>
+      }
     </section>
   )
 };

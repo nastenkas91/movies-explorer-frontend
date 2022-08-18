@@ -1,29 +1,46 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import './Profile.css';
-import Navigation from "../Navigation/Navigation";
 import {NavLink} from "react-router-dom";
-import useFormValidation from "../../utils/validateForm";
-import {isDisabled} from "@testing-library/user-event/dist/utils";
+import useFormValidation from "../../utils/useFormValidation";
+import { CurrentUserContext } from "../../contexts/CurrentUserContext";
 
-function Profile() {
-  const { userData, errors, isValid, formIsValid, handleChange } = useFormValidation({name: 'Анастасия', email: 'mail@mail.ru'});
+function Profile({ handleLogOut, handleUpdateProfile }) {
+  const currentUser = useContext(CurrentUserContext);
+
+  const { values, setValues, errors, formIsValid, setFormIsValid, handleChange } = useFormValidation({ name: currentUser.name, email: currentUser.email});
   const [isUpdating, setIsUpdating] = useState(false);
   const [isInputDisabled, setIsInputDisabled] =useState(true);
+
+  useEffect(() => {
+    setValues({name: currentUser.name, email: currentUser.email});
+    setIsUpdating(false);
+    setIsInputDisabled(true);
+  }, [currentUser, setValues, handleUpdateProfile])
+
+  //введённая информация соответствует текущим данным пользователя
+  useEffect(() => {
+    if (values.name === currentUser.name && values.email === currentUser.email) {
+      setFormIsValid(false);
+    }
+  }, [values])
 
   function handleUpdateButton() {
     setIsUpdating(true);
     setIsInputDisabled(false);
+    setFormIsValid(false);
   }
 
   function handleSubmit(e) {
     e.preventDefault();
     setIsUpdating(false);
     setIsInputDisabled(true);
+    handleUpdateProfile({ name: values.name, email: values.email})
   }
+
   return (
     <section className="profile">
       <form className="form profile__form" onSubmit={handleSubmit} noValidate>
-      <h2 className="profile__title">Привет, {userData.name}!</h2>
+      <h2 className="profile__title">Привет, {currentUser.name}!</h2>
       <div className="profile__input-wraper">
         <p className="profile__input-placeholder">Имя</p>
         <input
@@ -33,7 +50,7 @@ function Profile() {
           required
           minLength='2'
           maxLength='30'
-          value={userData.name}
+          value={values.name || ''}
           onChange={handleChange}
           disabled={isInputDisabled}
         />
@@ -47,7 +64,7 @@ function Profile() {
           type="email"
           className="profile__input"
           required
-          value={userData.email}
+          value={values.email || ''}
           onChange={handleChange}
           disabled={isInputDisabled}
         />
@@ -55,7 +72,7 @@ function Profile() {
       <span className='form__error'>{errors.email}</span>
       <div className={`profile__btn-wraper ${isUpdating && 'profile__btn-wraper_invisible'}`}>
         <button type='button' className="profile__update-btn" onClick={handleUpdateButton}>Редактировать</button>
-        <NavLink to='/' className="profile__leave-btn">Выйти из аккаунта</NavLink>
+        <NavLink onClick={handleLogOut} to='/' className="profile__leave-btn">Выйти из аккаунта</NavLink>
       </div>
       <button type="submit" disabled={!formIsValid} type='submit' className={`profile__submit-btn ${!isUpdating && 'profile__btn-wraper_invisible'}
       ${!formIsValid && 'profile__submit-btn_disabled'}`}>Сохранить</button>

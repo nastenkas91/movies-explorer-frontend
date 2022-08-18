@@ -2,7 +2,7 @@ import React from "react";
 import './Login.css';
 import Form from '../Form/Form';
 
-function Login() {
+function Login({ handleLogin }) {
   return (
     <div className="login">
       <Form
@@ -12,6 +12,7 @@ function Login() {
         spanText={'Ещё не зарегистрированы?'}
         spanBtn={' Регистрация'}
         spanBtnLink={'/signup'}
+        handleSubmit={handleLogin}
       />
     </div>
   )

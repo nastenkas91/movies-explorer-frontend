@@ -3,10 +3,11 @@ import './Navigation.css';
 import {NavLink} from "react-router-dom";
 import {useLocation} from "react-router";
 import accountLogo from "../../images/account-icon-main.svg"
-import BurgerMenu from "../BurgerMenu/BurgerMenu";
 import HeaderLogo from "../HeaderLogo/HeaderLogo";
+import BurgerMenu from "../BurgerMenu/BurgerMenu";
+import BurgerButton from "../BurgerButton/BurgerButton";
 
-function Navigation() {
+function Navigation({ isBurgerMenuOpen, handleMenuState }) {
   const location = useLocation();
 
   return (
@@ -28,7 +29,11 @@ function Navigation() {
       </div>
 
       {/*бургерное меню для лэндинга и страниц аккаунта авторизованного пользователя*/}
-      <BurgerMenu />
+      <BurgerButton isOpen={isBurgerMenuOpen} handleMenuState={handleMenuState} />
+      <BurgerMenu
+        isOpen={isBurgerMenuOpen}
+        handleLinkClick={handleMenuState}
+      />
     </nav>
   );
 }

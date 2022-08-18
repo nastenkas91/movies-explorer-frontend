@@ -2,11 +2,13 @@
   background: #fafafa;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  min-height: 90vh;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 80vh;
 }
 
 .movies__more-btn {
+  display: none;
   margin: 50px auto 80px;
   width: 320px;
   height: 36px;
@@ -22,6 +24,10 @@
 
 .movies__more-btn:hover {
   opacity: 0.8;
+}
+
+.movies__more-btn_visible {
+  display: block;
 }
 
 

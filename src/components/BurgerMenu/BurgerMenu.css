@@ -1,65 +1,22 @@
-#burger-toggle {
-  position: absolute;
-  right: 22px;
-  top: 27px;
-  z-index: 3;
-  width: 28px;
-  height: 23px;
-  opacity: 0;
-}
-
-.burger__button {
+.burger__menu-container {
+  background: rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
-  align-self: center;
-  margin: 0 0 0 auto;
-  width: 28px;
-  height: 23px;
-  cursor: pointer;
-  position: absolute;
-  right: 22px;
-  top: 27px;
-  z-index: 2;
-}
-
-.burger__line {
-  width: 28px;
-  height: 3px;
-  background-color: #000;
-  transform: rotate(0);
-  transition: 0.5s ease-in-out;
-}
-
-.burger__line::before, .burger__line::after {
-  position: absolute;
-  width: 100%;
-  height: 3px;
-  background-color: black;
-  transform: rotate(0);
-  transition: 0.5s ease-in-out;
-}
-
-.burger__line::before {
-  content: '';
-  top: -10px;
+  justify-content: center;
+  position: fixed;
   left: 0;
-}
-
-.burger__line::after {
-  content: '';
-  top: 10px;
-  left: 0;
-}
-
-.burger__menu-cover {
-  display: none;
-  width: 100%;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.3);
-  position: absolute;
   top: 0;
-  right: 0;
-  z-index: 1;
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.4s, opacity 0.4s linear;
+  z-index: 10;
+}
+
+.burger__menu-container_opened {
+  visibility: visible;
+  opacity: 1
 }
 
 .burger__menu {
@@ -71,13 +28,14 @@
   align-items: center;
   width: 520px;
   height: 100vh;
-  position: absolute;
+  position: fixed;
   top: 0;
   right: 0;
   margin: 0;
   list-style-type: none;
   padding: 159px 90px 90px;
   box-sizing: border-box;
+  z-index: 12;
 }
 
 .burger__menu-item {
@@ -123,24 +81,6 @@
   box-sizing: border-box;
 }
 
-#burger-toggle:checked ~ .burger__button > .burger__line {
-  transform: rotate(45deg);
-}
-
-#burger-toggle:checked ~ .burger__button > .burger__line::before {
-  top: 0;
-  transform: rotate(0);
-}
-
-#burger-toggle:checked ~ .burger__button > .burger__line::after {
-  top: 0;
-  transform: rotate(90deg);
-}
-
-#burger-toggle:checked ~ .burger__menu-cover {
-  display: flex;
-}
-
 @media screen and (max-width: 550px) {
   .burger__menu {
     width: 100%;
@@ -157,16 +97,7 @@
 }
 
 @media screen and (min-width: 769px) {
-  .burger__checkbox {
-    display: none;
-  }
-
-  .burger__button {
-    display: none;
-  }
-
-  #burger-toggle:checked ~ .burger__menu-cover {
+  .burger__menu {
     display: none;
   }
 }
-
