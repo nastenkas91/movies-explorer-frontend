@@ -7,7 +7,7 @@ function NotFoundPage( ) {
 
   function goBack() {
     console.log('click')
-    navigate(-3)
+    navigate(-1)
   }
 
   return (
