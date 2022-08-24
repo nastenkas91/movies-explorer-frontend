@@ -80,6 +80,9 @@ function App() {
             return res.message
           }
         })
+        .catch((err) => {
+          console.log(err)
+        });
     } else {
       return;
     }
@@ -96,9 +99,9 @@ function App() {
           localStorage.setItem('savedMovies', JSON.stringify(res[1]));
           localStorage.setItem('moviesOnSaved', JSON.stringify(res[1]));
         })
-        .catch(((err) => {
+        .catch((err) => {
           console.log(err)
-        }));
+        });
     }
   }, [loggedIn])
 
@@ -326,6 +329,7 @@ function App() {
               element={<Movies
                 handleMovieSearch={handleSearch}
                 filteredMovies={filteredMovies}
+                savedMovies={savedMovies}
                 setFilteredMovies={setFilteredMovies}
                 checkWindowSize={checkWindowSize}
                 amountOfCards={amountOfCards}

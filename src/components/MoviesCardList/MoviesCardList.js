@@ -3,7 +3,7 @@ import './MoviesCardList.css';
 import MoviesCard from "../MoviesCard/MoviesCard";
 import { notFoundMessage} from "../../utils/constants";
 
-function MoviesCardList({ cards, handleMovieSaving, handleMovieDelete, amountOfCards, nothingFound }) {
+function MoviesCardList({ cards, savedMovies, handleMovieSaving, handleMovieDelete, amountOfCards, nothingFound }) {
 
   return (
     <>
@@ -18,6 +18,7 @@ function MoviesCardList({ cards, handleMovieSaving, handleMovieDelete, amountOfC
                   movie={movie}
                   handleMovieSaving={handleMovieSaving}
                   handleMovieDelete={handleMovieDelete}
+                  savedMovies={savedMovies}
                 />)
               )}
           </ul>

@@ -3,7 +3,7 @@ import './SavedMovies.css';
 import SearchForm from "../SearchForm/SearchForm";
 import MoviesCardList from "../MoviesCardList/MoviesCardList";
 
-function SavedMovies({ handleMovieDelete, handleMovieSearch, shownSavedMovies, setShownSavedMovies, checkWindowSize, nothingFound }) {
+function SavedMovies({ handleMovieDelete, handleMovieSearch, shownSavedMovies, setShownSavedMovies, checkWindowSize, nothingFound, savedMovies }) {
 
   useEffect(() => {
     if (localStorage.getItem('savedMovies')) {
@@ -16,7 +16,7 @@ function SavedMovies({ handleMovieDelete, handleMovieSearch, shownSavedMovies, s
   return (
     <div className="saved-movies">
       <SearchForm handleMovieSearch={handleMovieSearch} setShownSavedMovies={setShownSavedMovies} />
-      <MoviesCardList cards={shownSavedMovies} handleMovieDelete={handleMovieDelete} nothingFound={nothingFound} />
+      <MoviesCardList cards={shownSavedMovies} handleMovieDelete={handleMovieDelete} nothingFound={nothingFound} savedMovies={savedMovies} />
     </div>
   )
 };

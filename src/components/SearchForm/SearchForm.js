@@ -41,6 +41,7 @@ function SearchForm({ handleMovieSearch, setFilteredMovies, setShownSavedMovies 
       let filteredData = handleDurationFiltration(movies);
       if (location.pathname === '/movies') {
         setFilteredMovies(filteredData);
+        localStorage.setItem('filteredMovies', JSON.stringify(filteredData));
       }
       else if (location.pathname === '/saved-movies') {
         setShownSavedMovies(filteredData)
@@ -70,6 +71,7 @@ function SearchForm({ handleMovieSearch, setFilteredMovies, setShownSavedMovies 
   function handleSubmit(e) {
     if (isValid) {
       e.preventDefault();
+      localStorage.setItem('shortMovieChecked', JSON.stringify(isShortMovieChecked));
       handleMovieSearch(request, isShortMovieChecked);
       if (location.pathname === '/movies') {
         localStorage.setItem('request', JSON.stringify(request))

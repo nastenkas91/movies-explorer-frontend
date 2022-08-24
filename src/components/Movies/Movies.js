@@ -5,7 +5,7 @@ import MoviesCardList from "../MoviesCardList/MoviesCardList";
 import Preloader from "../Preloader/Preloader";
 import {useLocation} from "react-router-dom";
 
-function Movies({ handleMovieSearch, isLoading, handleMovieSaving, handleMovieDelete, checkWindowSize, amountOfCards, setAmountOfCards, rowLength, filteredMovies, setFilteredMovies, nothingFound  }) {
+function Movies({ handleMovieSearch, isLoading, handleMovieSaving, handleMovieDelete, checkWindowSize, amountOfCards, setAmountOfCards, rowLength, filteredMovies, setFilteredMovies, nothingFound, savedMovies  }) {
   const location = useLocation();
 
   //кнопка "Еще"
@@ -26,7 +26,7 @@ function Movies({ handleMovieSearch, isLoading, handleMovieSaving, handleMovieDe
     <section className="movies">
       <SearchForm handleMovieSearch={handleMovieSearch} setFilteredMovies={setFilteredMovies} />
       { isLoading && <Preloader/> }
-      <MoviesCardList cards={filteredMovies} handleMovieSaving={handleMovieSaving} handleMovieDelete={handleMovieDelete} amountOfCards={amountOfCards} nothingFound={nothingFound} />
+      <MoviesCardList cards={filteredMovies} handleMovieSaving={handleMovieSaving} handleMovieDelete={handleMovieDelete} amountOfCards={amountOfCards} nothingFound={nothingFound} savedMovies={savedMovies} />
       {
         (location.pathname === '/movies' && filteredMovies.length > amountOfCards)
         &&
